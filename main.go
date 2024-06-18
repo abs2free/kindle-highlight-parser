@@ -56,20 +56,3 @@ func processFile(file string) {
 		log.Fatalf("build markdown error:%v", err)
 	}
 }
-
-// ListDirFiles lists all the file or dir names in the specified directory.
-// Note that ListDirFiles don't traverse recursively.
-func ListDirFiles(dirname string) ([]string, error) {
-	infos, err := os.ReadDir(dirname)
-	if err != nil {
-		return nil, err
-	}
-	names := make([]string, len(infos))
-	for i, info := range infos {
-		if info.IsDir() {
-			continue
-		}
-		names[i] = info.Name()
-	}
-	return names, nil
-}

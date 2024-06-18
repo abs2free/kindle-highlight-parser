@@ -28,3 +28,20 @@ func PathExists(path string) (bool, error) {
 	}
 	return false, err //如果有错误了，但是不是不存在的错误，所以把这个错误原封不动的返回
 }
+
+// ListDirFiles lists all the file or dir names in the specified directory.
+// Note that ListDirFiles don't traverse recursively.
+func ListDirFiles(dirname string) ([]string, error) {
+	infos, err := os.ReadDir(dirname)
+	if err != nil {
+		return nil, err
+	}
+	names := make([]string, len(infos))
+	for i, info := range infos {
+		if info.IsDir() {
+			continue
+		}
+		names[i] = info.Name()
+	}
+	return names, nil
+}

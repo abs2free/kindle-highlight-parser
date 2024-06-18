@@ -62,7 +62,7 @@ func buildMarkdown(dir string, content Content) (err error) {
 
 			b.LF().PlainTextf("- location: [%d]()", heading.Location).LF()
 
-			if !nextNote(i, section.Notes) {
+			if !hasNote(i, section.Notes) {
 				b.HorizontalRule().LF()
 			}
 		}
@@ -71,7 +71,7 @@ func buildMarkdown(dir string, content Content) (err error) {
 	return b.Build()
 }
 
-func nextNote(i int, notes []Note) bool {
+func hasNote(i int, notes []Note) bool {
 	heading := notes[i].Heading
 
 	if heading.Type == NoteHeadingType {
