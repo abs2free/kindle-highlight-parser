@@ -1,15 +1,27 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
+	"io"
 	"os"
+	"regexp"
+	"strconv"
+	"strings"
 
 	md "github.com/nao1215/markdown"
 )
 
-func buildMarkdown(dir string, content Content) error {
+func buildMarkdown(dir string, content Content) (err error) {
 	meta := content.Meta
+
 	name := fmt.Sprintf("%s/%s.md", dir, meta.Title)
+
+	blocks, err := originFileBlocks(name)
+	if err != nil {
+		return err
+	}
+
 	f, err := os.Create(name)
 	if err != nil {
 		panic(err)
@@ -42,6 +54,12 @@ func buildMarkdown(dir string, content Content) error {
 				b.PlainTextf("> [!note]   %s", note.Text)
 			}
 
+			if blocks != nil {
+				if block, ok := blocks[heading.Location]; ok {
+					b.PlainText(block).LF()
+				}
+			}
+
 			b.LF().PlainTextf("- location: [%d]()", heading.Location).LF()
 
 			if !nextNote(i, section.Notes) {
@@ -69,4 +87,52 @@ func nextNote(i int, notes []Note) bool {
 		return true
 	}
 	return false
+}
+func originFileBlocks(name string) (blocks map[int]string, err error) {
+	exists, err := PathExists(name)
+	if err != nil {
+		return nil, fmt.Errorf("name, PathExists:%w", name, err)
+	}
+	if !exists {
+		return nil, fmt.Errorf("name not exists", name)
+	}
+
+	f, err := os.Open(name)
+	if err != nil {
+		return
+	}
+	defer f.Close()
+
+	br := bufio.NewReader(f)
+	block := ""
+	for {
+		a, _, c := br.ReadLine()
+		if c == io.EOF {
+			break
+		}
+		line := string(a)
+
+		// 判断是否存在
+		if strings.HasPrefix(line, "^") {
+			block = line
+		}
+
+		// 查找下一个location
+		if block != "" {
+			if strings.HasPrefix(line, "- location") {
+				valid := regexp.MustCompile("[0-9]+")
+				location := valid.FindAllStringSubmatch(line, -1)
+				l, _ := strconv.Atoi(location[0][0])
+
+				if blocks == nil {
+					blocks = make(map[int]string)
+				}
+
+				blocks[l] = block
+				block = ""
+			}
+		}
+	}
+
+	return
 }

@@ -3,7 +3,6 @@ package main
 import (
 	"bufio"
 	"flag"
-	"fmt"
 	"log"
 	"os"
 
@@ -34,16 +33,6 @@ func main() {
 	for _, file := range files {
 		processFile(*inputDir + file)
 	}
-}
-func isDir(path string) (bool, error) {
-	dirinfo, err := os.Stat(path)
-	if err != nil {
-		return false, fmt.Errorf("dir:%s has a error:%w", path, err)
-	}
-	if !dirinfo.IsDir() {
-		return false, fmt.Errorf("path:%s is not dir", path)
-	}
-	return true, nil
 }
 
 func processFile(file string) {
