@@ -99,18 +99,27 @@ func parseContent(doc *goquery.Document) (sections []Section, err error) {
 func parseHeading(h string) (heading Heading, err error) {
 	h = strings.TrimSpace(h)
 
-	s := strings.Split(h, "-")
-	st := strings.TrimSpace(s[0])
+	var st, sub, location string
+	if strings.Contains(h, ">") {
+		s := strings.Split(h, "-")
+		st = strings.TrimSpace(s[0])
+		ss := strings.Split(s[1], ">")
+		sub = ss[0]
+		location = ss[1]
+	} else {
+		s := strings.Split(h, "-")
+		st = strings.TrimSpace(s[0])
+		location = s[1]
+	}
+
 	if strings.HasPrefix(st, "标注") || strings.HasPrefix(st, "Highlight") {
 		heading.Type = HeadingTypeHighlight
 	} else {
 		heading.Type = HeadingTypeNote
 	}
 
-	ss := strings.Split(s[1], ">")
-	heading.SubTitle = strings.TrimSpace(ss[0])
-	location := strings.TrimSpace(ss[1])
-	l, err := extractNumber(location)
+	heading.SubTitle = strings.TrimSpace(sub)
+	l, err := extractNumber(strings.TrimSpace(location))
 	if err != nil {
 		err = fmt.Errorf("extractNumber:%s has error:%w", location, err)
 		return

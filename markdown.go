@@ -51,7 +51,7 @@ func buildMarkdown(dir string, content Content) (err error) {
 			if heading.Type == HeadingTypeHighlight {
 				b.Blockquote(note.Text)
 			} else {
-				b.PlainTextf("> [!note]   %s", note.Text)
+				b.Note(note.Text)
 			}
 
 			if blocks != nil {

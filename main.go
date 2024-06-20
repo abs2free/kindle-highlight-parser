@@ -15,8 +15,8 @@ var (
 )
 
 func main() {
-	inputDir = flag.String("i", "html", "dir path to read from")
-	outputDir = flag.String("o", ".", "dir path to write to")
+	inputDir = flag.String("i", "../html/", "dir path to read from")
+	outputDir = flag.String("o", "../", "dir path to write to")
 	flag.Parse()
 
 	if ok, err := isDir(*inputDir); !ok {
