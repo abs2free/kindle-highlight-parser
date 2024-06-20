@@ -48,7 +48,7 @@ func buildMarkdown(dir string, content Content) (err error) {
 				b.H4(subTitle).LF()
 			}
 
-			if heading.Type == MarkHeadingType {
+			if heading.Type == HeadingTypeHighlight {
 				b.Blockquote(note.Text)
 			} else {
 				b.PlainTextf("> [!note]   %s", note.Text)
@@ -74,7 +74,7 @@ func buildMarkdown(dir string, content Content) (err error) {
 func hasNote(i int, notes []Note) bool {
 	heading := notes[i].Heading
 
-	if heading.Type == NoteHeadingType {
+	if heading.Type == HeadingTypeNote {
 		return false
 	}
 
@@ -82,7 +82,7 @@ func hasNote(i int, notes []Note) bool {
 		return false
 	}
 
-	if notes[i+1].Heading.Type == NoteHeadingType {
+	if notes[i+1].Heading.Type == HeadingTypeNote {
 
 		return true
 	}
@@ -91,10 +91,10 @@ func hasNote(i int, notes []Note) bool {
 func originFileBlocks(name string) (blocks map[int]string, err error) {
 	exists, err := PathExists(name)
 	if err != nil {
-		return nil, fmt.Errorf("name, PathExists:%w", name, err)
+		return nil, fmt.Errorf("name:%s, PathExists:%w", name, err)
 	}
 	if !exists {
-		return nil, fmt.Errorf("name not exists", name)
+		return nil, nil
 	}
 
 	f, err := os.Open(name)

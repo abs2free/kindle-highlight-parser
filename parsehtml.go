@@ -14,13 +14,6 @@ type MetaData struct {
 	Citation string
 }
 
-type HeadingType int
-
-const (
-	MarkHeadingType HeadingType = iota
-	NoteHeadingType
-)
-
 type Content struct {
 	Meta     MetaData
 	Sections []Section
@@ -41,6 +34,13 @@ type Heading struct {
 	SubTitle string
 	Location int
 }
+
+type HeadingType int
+
+const (
+	HeadingTypeHighlight HeadingType = iota
+	HeadingTypeNote
+)
 
 func parseHtml(doc *goquery.Document) (content Content, err error) {
 	content.Meta = parseMetaData(doc)
@@ -102,10 +102,10 @@ func parseHeading(h string) (heading Heading, err error) {
 
 	s := strings.Split(h, "-")
 	st := strings.TrimSpace(s[0])
-	if strings.HasPrefix(st, "标注") {
-		heading.Type = MarkHeadingType
+	if strings.HasPrefix(st, "标注") || strings.HasPrefix(st, "Highlight") {
+		heading.Type = HeadingTypeHighlight
 	} else {
-		heading.Type = NoteHeadingType
+		heading.Type = HeadingTypeNote
 	}
 
 	ss := strings.Split(s[1], ">")
@@ -113,6 +113,7 @@ func parseHeading(h string) (heading Heading, err error) {
 
 	location := strings.TrimSpace(ss[1])
 	location = strings.TrimLeft(location, "位置 ")
+	location = strings.TrimLeft(location, "Location ")
 	l, err := strconv.Atoi(location)
 	if err != nil {
 		return Heading{}, err
