@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"strconv"
 	"strings"
 
 	"github.com/PuerkitoBio/goquery"
@@ -110,13 +109,11 @@ func parseHeading(h string) (heading Heading, err error) {
 
 	ss := strings.Split(s[1], ">")
 	heading.SubTitle = strings.TrimSpace(ss[0])
-
 	location := strings.TrimSpace(ss[1])
-	location = strings.TrimLeft(location, "位置 ")
-	location = strings.TrimLeft(location, "Location ")
-	l, err := strconv.Atoi(location)
+	l, err := extractNumber(location)
 	if err != nil {
-		return Heading{}, err
+		err = fmt.Errorf("extractNumber:%s has error:%w", location, err)
+		return
 	}
 	heading.Location = l
 
